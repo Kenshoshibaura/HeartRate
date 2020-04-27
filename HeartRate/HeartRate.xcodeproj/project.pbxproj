@@ -23,6 +23,8 @@
 		BE9885F824571C2700ABC0ED /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9885F724571C2700ABC0ED /* ExtensionDelegate.swift */; };
 		BE9885FA24571C2700ABC0ED /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE9885F924571C2700ABC0ED /* NotificationController.swift */; };
 		BE9885FC24571C2900ABC0ED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE9885FB24571C2900ABC0ED /* Assets.xcassets */; };
+		BE98861524571CD000ABC0ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE98861424571CD000ABC0ED /* HealthKit.framework */; };
+		BE98861824571D0A00ABC0ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE98861724571D0A00ABC0ED /* HealthKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -107,6 +109,10 @@
 		BE9885FB24571C2900ABC0ED /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BE9885FD24571C2900ABC0ED /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE9885FE24571C2900ABC0ED /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
+		BE98861224571CD000ABC0ED /* HeartRate WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "HeartRate WatchKit Extension.entitlements"; sourceTree = "<group>"; };
+		BE98861424571CD000ABC0ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS6.2.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
+		BE98861624571D0A00ABC0ED /* HeartRate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HeartRate.entitlements; sourceTree = "<group>"; };
+		BE98861724571D0A00ABC0ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,6 +120,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE98861824571D0A00ABC0ED /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +142,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE98861524571CD000ABC0ED /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -150,6 +158,7 @@
 				BE9885E524571C2600ABC0ED /* HeartRate WatchKit App */,
 				BE9885F424571C2700ABC0ED /* HeartRate WatchKit Extension */,
 				BE9885B824571C2300ABC0ED /* Products */,
+				BE98861324571CD000ABC0ED /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -168,6 +177,7 @@
 		BE9885B924571C2300ABC0ED /* HeartRate */ = {
 			isa = PBXGroup;
 			children = (
+				BE98861624571D0A00ABC0ED /* HeartRate.entitlements */,
 				BE9885BA24571C2300ABC0ED /* AppDelegate.swift */,
 				BE9885BC24571C2300ABC0ED /* SceneDelegate.swift */,
 				BE9885BE24571C2300ABC0ED /* ViewController.swift */,
@@ -210,6 +220,7 @@
 		BE9885F424571C2700ABC0ED /* HeartRate WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
+				BE98861224571CD000ABC0ED /* HeartRate WatchKit Extension.entitlements */,
 				BE9885F524571C2700ABC0ED /* InterfaceController.swift */,
 				BE9885F724571C2700ABC0ED /* ExtensionDelegate.swift */,
 				BE9885F924571C2700ABC0ED /* NotificationController.swift */,
@@ -218,6 +229,15 @@
 				BE9885FE24571C2900ABC0ED /* PushNotificationPayload.apns */,
 			);
 			path = "HeartRate WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		BE98861324571CD000ABC0ED /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				BE98861724571D0A00ABC0ED /* HealthKit.framework */,
+				BE98861424571CD000ABC0ED /* HealthKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -615,6 +635,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "HeartRate WatchKit Extension/HeartRate WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = C62X86K82C;
 				INFOPLIST_FILE = "HeartRate WatchKit Extension/Info.plist";
@@ -637,6 +658,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_ENTITLEMENTS = "HeartRate WatchKit Extension/HeartRate WatchKit Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = C62X86K82C;
 				INFOPLIST_FILE = "HeartRate WatchKit Extension/Info.plist";
@@ -697,6 +719,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = HeartRate/HeartRate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = C62X86K82C;
 				INFOPLIST_FILE = HeartRate/Info.plist;
@@ -715,6 +738,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = HeartRate/HeartRate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = C62X86K82C;
 				INFOPLIST_FILE = HeartRate/Info.plist;
