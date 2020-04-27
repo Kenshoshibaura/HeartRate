@@ -68,6 +68,16 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
+    @IBOutlet weak var CountHeart: WKInterfaceLabel!
+    var heartRateCount: Double = 0.0 {
+        didSet {
+            if self.heartRateCount < 0.0 {
+                CountHeart.setText("回数 : ----")
+            } else {
+                CountHeart.setText("回数 : \(self.heartRateCount)")
+            }
+        }
+    }
 
     var dateWorkoutSessionStart: Date?
     var dateWorkoutSessionEnd: Date?
@@ -82,6 +92,7 @@ class InterfaceController: WKInterfaceController {
             self.heartRateAverage = -1.0
             self.heartRateMax = -1.0
             self.heartRateMin = -1.0
+            self.heartRateCount = -1.0
         } else {
             // WorkoutSession終了
             self.stopWorkoutSession()
@@ -161,7 +172,12 @@ class InterfaceController: WKInterfaceController {
                    // 値取り出し
                    let values = samples.map{ ($0 as! HKQuantitySample).quantity.doubleValue(for: self.hkUnitHeartRate) }
                    NSLog("[updateHeartRateWO] resultHandler values: \(values)")
-                   
+
+                    // 回数取得
+                    let count = Double(values.count)
+                    self.heartRateCount = count
+                    NSLog("[updateHeartRateWO] resultHandler Count value:\(count)")
+
                    // 平均値取得
                    let total = values.reduce(0, +)
                    let average = total / Double(values.count)

@@ -21,9 +21,11 @@
                         <label alignment="left" text="平均：----" id="e99-ud-gzY"/>
                         <label alignment="left" text="最大：----" id="QDc-8M-vqX"/>
                         <label alignment="left" text="最小：----" id="udi-qg-xPl"/>
+                        <label alignment="left" text="回数：----" id="Ggw-Mb-9Sz"/>
                     </items>
                     <connections>
                         <outlet property="AverageHeart" destination="e99-ud-gzY" id="l84-qU-4c5"/>
+                        <outlet property="CountHeart" destination="Ggw-Mb-9Sz" id="Ofn-Iw-CIU"/>
                         <outlet property="LatestHeart" destination="SZF-yf-fHv" id="Boi-pA-sRb"/>
                         <outlet property="MaxHeart" destination="QDc-8M-vqX" id="NPT-fL-pay"/>
                         <outlet property="MinHeart" destination="udi-qg-xPl" id="Bhl-zj-NJk"/>
