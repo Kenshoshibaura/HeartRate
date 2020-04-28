@@ -17,6 +17,7 @@
                             </connections>
                         </switch>
                         <label alignment="left" text="最新：----" id="SZF-yf-fHv"/>
+                        <label alignment="left" text="直前：----" id="hGk-2L-C53"/>
                         <label alignment="left" text="日時：----" id="ERx-1c-Ali"/>
                         <label alignment="left" text="Workout結果" id="qPj-fh-p5t"/>
                         <label alignment="left" text="平均：----" id="e99-ud-gzY"/>
@@ -26,6 +27,7 @@
                     </items>
                     <connections>
                         <outlet property="AverageHeart" destination="e99-ud-gzY" id="l84-qU-4c5"/>
+                        <outlet property="BeforeHeart" destination="hGk-2L-C53" id="e9a-nr-hnl"/>
                         <outlet property="CountHeart" destination="Ggw-Mb-9Sz" id="Ofn-Iw-CIU"/>
                         <outlet property="LatestHeart" destination="SZF-yf-fHv" id="Boi-pA-sRb"/>
                         <outlet property="MaxHeart" destination="QDc-8M-vqX" id="NPT-fL-pay"/>

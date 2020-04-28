@@ -13,18 +13,18 @@ import HealthKit
 class InterfaceController: WKInterfaceController {
     
     var hkWorkoutSession: HKWorkoutSession?
-
+    
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         
         // Configure interface objects here.
     }
-        
+    
     override func didDeactivate() {
         // This method is called when watch view controller is no longer visible
         super.didDeactivate()
     }
-
+    
     @IBOutlet weak var LatestHeart: WKInterfaceLabel!
     var heartRateLatest: Double = 0.0 {
         didSet {
@@ -32,6 +32,17 @@ class InterfaceController: WKInterfaceController {
                 LatestHeart.setText("最新 : ----")
             } else {
                 LatestHeart.setText("最新 : \(self.heartRateLatest)")
+            }
+        }
+    }
+    
+    @IBOutlet weak var BeforeHeart: WKInterfaceLabel!
+    var heartRateBefore: Double = 0.0 {
+        didSet {
+            if self.heartRateBefore < 0.0 {
+                BeforeHeart.setText("直前 : ----")
+            } else {
+                BeforeHeart.setText("直前 : \(self.heartRateBefore)")
             }
         }
     }
@@ -46,7 +57,7 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
-
+    
     @IBOutlet weak var AverageHeart: WKInterfaceLabel!
     var heartRateAverage: Double = 0.0 {
         didSet {
@@ -57,7 +68,7 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
-
+    
     @IBOutlet weak var MaxHeart: WKInterfaceLabel!
     var heartRateMax: Double = 0.0 {
         didSet {
@@ -68,7 +79,7 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
-
+    
     @IBOutlet weak var MinHeart: WKInterfaceLabel!
     var heartRateMin: Double = 0.0 {
         didSet {
@@ -89,10 +100,10 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
-
+    
     var dateWorkoutSessionStart: Date?
     var dateWorkoutSessionEnd: Date?
-
+    
     // Workout状態設定スイッチ操作時の処理ハンドラ
     @IBAction func WorkoutManager(_ value: Bool) {
         if (value) {
@@ -115,11 +126,11 @@ class InterfaceController: WKInterfaceController {
     let hkStore = HKHealthStore()
     var hkIsAuthorized = false
     let hkTypeHeartRate = HKObjectType.quantityType(forIdentifier: .heartRate)!
-
+    
     // 定周期処理
     var timerReadHK: Timer?
     let timerIntervalReadHK = 5.0
-
+    
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
         super.willActivate()
@@ -144,7 +155,7 @@ class InterfaceController: WKInterfaceController {
             self.startReadHK()
         }
     }
-
+    
     // HealthKit データ読み出しの開始
     func startReadHK() {
         self.timerReadHK = Timer.scheduledTimer(timeInterval: self.timerIntervalReadHK, target: self, selector: #selector(self.updateHeartRateNormal), userInfo: nil, repeats: true)
@@ -152,72 +163,75 @@ class InterfaceController: WKInterfaceController {
     
     let hkUnitHeartRate = HKUnit(from: "count/min")
     
+    var BeforeHeartTemp = 0.0
     
-   // 通常時の心拍数情報更新処理
-   @objc func updateHeartRateNormal() {
-       if self.hkIsAuthorized {
-           let sortDescriptors = [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
-           let query = HKSampleQuery(sampleType: self.hkTypeHeartRate, predicate: nil, limit: 1, sortDescriptors: sortDescriptors, resultsHandler: { (query, samples, error) -> Void in
-               if let error = error {
-                   NSLog("[updateHeartRateNormal] resultHandler error: \(error.localizedDescription)")
-               } else if let samples = samples {
-                   let sample = samples[0] as! HKQuantitySample
-                   NSLog("[updateHeartRateNormal] resultHandler sample: \(sample.debugDescription)")
-                   let value = sample.quantity.doubleValue(for: self.hkUnitHeartRate)
+    // 通常時の心拍数情報更新処理
+    @objc func updateHeartRateNormal() {
+        if self.hkIsAuthorized {
+            let sortDescriptors = [NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: false)]
+            let query = HKSampleQuery(sampleType: self.hkTypeHeartRate, predicate: nil, limit: 1, sortDescriptors: sortDescriptors, resultsHandler: { (query, samples, error) -> Void in
+                if let error = error {
+                    NSLog("[updateHeartRateNormal] resultHandler error: \(error.localizedDescription)")
+                } else if let samples = samples {
+                    let sample = samples[0] as! HKQuantitySample
+                    NSLog("[updateHeartRateNormal] resultHandler sample: \(sample.debugDescription)")
+                    let value = sample.quantity.doubleValue(for: self.hkUnitHeartRate)
                     let formatter = DateFormatter()
                     formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MdHms", options: 0, locale: Locale(identifier: "ja_JP"))
                     let now = formatter.string(from: Date())
-
-                   DispatchQueue.main.async {
-                       self.heartRateLatest = value
-                       self.heartRateTime = now
-                   }
-               }
-           } )
-           self.hkStore.execute(query)
-       }
-   }
+                    
+                    DispatchQueue.main.async {
+                        self.heartRateLatest = value
+                        self.heartRateBefore = self.BeforeHeartTemp
+                        self.BeforeHeartTemp = value
+                        self.heartRateTime = now
+                    }
+                }
+            } )
+            self.hkStore.execute(query)
+        }
+    }
     
     // WorkoutSession時の心拍数情報更新処理
-   func updateHeartRateWO(start: Date, end: Date) {
-       if self.hkIsAuthorized {
-           let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
-           let query = HKSampleQuery(sampleType: self.hkTypeHeartRate, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil, resultsHandler: {(query, samples, error) -> Void in
-               if let error = error {
-                   NSLog("[updateHeartRateWO] resultHandler error: \(error.localizedDescription)")
-               } else if let samples = samples {
-                   // 値取り出し
-                   let values = samples.map{ ($0 as! HKQuantitySample).quantity.doubleValue(for: self.hkUnitHeartRate) }
-                   NSLog("[updateHeartRateWO] resultHandler values: \(values)")
-
+    func updateHeartRateWO(start: Date, end: Date) {
+        if self.hkIsAuthorized {
+            let predicate = HKQuery.predicateForSamples(withStart: start, end: end, options: [])
+            let query = HKSampleQuery(sampleType: self.hkTypeHeartRate, predicate: predicate, limit: HKObjectQueryNoLimit, sortDescriptors: nil, resultsHandler: {(query, samples, error) -> Void in
+                if let error = error {
+                    NSLog("[updateHeartRateWO] resultHandler error: \(error.localizedDescription)")
+                } else if let samples = samples {
+                    // 値取り出し
+                    let values = samples.map{ ($0 as! HKQuantitySample).quantity.doubleValue(for: self.hkUnitHeartRate) }
+                    NSLog("[updateHeartRateWO] resultHandler values: \(values)")
+                    
                     // 回数取得
                     let count = Double(values.count)
                     self.heartRateCount = count
                     NSLog("[updateHeartRateWO] resultHandler Count value:\(count)")
-
-                   // 平均値取得
-                   let total = values.reduce(0, +)
-                   let average = total / Double(values.count)
-                   self.heartRateAverage = average
-                   NSLog("[updateHeartRateWO] resultHandler Average value:\(average)")
-
-                   // 最大値取得
-                   if let max = values.max() {
-                       self.heartRateMax = max
-                       NSLog("[updateHeartRateWO] resultHandler Max value:\(max)")
-                   }
-                   
-                   // 最小値取得
-                   if let min = values.min() {
-                       self.heartRateMin = min
-                       NSLog("[updateHeartRateWO] resultHandler Min value:\(min)")
-                   }
-               }
-           })
-           self.hkStore.execute(query)
-       }
-   }
-        
+                    
+                    // 平均値取得
+                    let total = values.reduce(0, +)
+                    let average = total / Double(values.count)
+                    self.heartRateAverage = average
+                    NSLog("[updateHeartRateWO] resultHandler Average value:\(average)")
+                    
+                    // 最大値取得
+                    if let max = values.max() {
+                        self.heartRateMax = max
+                        NSLog("[updateHeartRateWO] resultHandler Max value:\(max)")
+                    }
+                    
+                    // 最小値取得
+                    if let min = values.min() {
+                        self.heartRateMin = min
+                        NSLog("[updateHeartRateWO] resultHandler Min value:\(min)")
+                    }
+                }
+            })
+            self.hkStore.execute(query)
+        }
+    }
+    
 }
 
 // Workout Session 用の拡張定義
