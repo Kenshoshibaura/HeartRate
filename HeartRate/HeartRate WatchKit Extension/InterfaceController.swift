@@ -35,6 +35,17 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
+    
+    @IBOutlet weak var TimeHeart: WKInterfaceLabel!
+    var heartRateTime: String = "0000年0月0日 00:00:00" {
+        didSet {
+            if self.heartRateTime == "0000年0月0日 00:00:00" {
+                TimeHeart.setText("日時 : ----")
+            } else {
+                TimeHeart.setText("日時 : \(self.heartRateTime)")
+            }
+        }
+    }
 
     @IBOutlet weak var AverageHeart: WKInterfaceLabel!
     var heartRateAverage: Double = 0.0 {
@@ -141,6 +152,7 @@ class InterfaceController: WKInterfaceController {
     
     let hkUnitHeartRate = HKUnit(from: "count/min")
     
+    
    // 通常時の心拍数情報更新処理
    @objc func updateHeartRateNormal() {
        if self.hkIsAuthorized {
@@ -152,8 +164,13 @@ class InterfaceController: WKInterfaceController {
                    let sample = samples[0] as! HKQuantitySample
                    NSLog("[updateHeartRateNormal] resultHandler sample: \(sample.debugDescription)")
                    let value = sample.quantity.doubleValue(for: self.hkUnitHeartRate)
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MdHms", options: 0, locale: Locale(identifier: "ja_JP"))
+                    let now = formatter.string(from: Date())
+
                    DispatchQueue.main.async {
                        self.heartRateLatest = value
+                       self.heartRateTime = now
                    }
                }
            } )

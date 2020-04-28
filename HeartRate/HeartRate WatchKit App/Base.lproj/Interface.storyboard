@@ -17,6 +17,7 @@
                             </connections>
                         </switch>
                         <label alignment="left" text="最新：----" id="SZF-yf-fHv"/>
+                        <label alignment="left" text="日時：----" id="ERx-1c-Ali"/>
                         <label alignment="left" text="Workout結果" id="qPj-fh-p5t"/>
                         <label alignment="left" text="平均：----" id="e99-ud-gzY"/>
                         <label alignment="left" text="最大：----" id="QDc-8M-vqX"/>
@@ -29,6 +30,7 @@
                         <outlet property="LatestHeart" destination="SZF-yf-fHv" id="Boi-pA-sRb"/>
                         <outlet property="MaxHeart" destination="QDc-8M-vqX" id="NPT-fL-pay"/>
                         <outlet property="MinHeart" destination="udi-qg-xPl" id="Bhl-zj-NJk"/>
+                        <outlet property="TimeHeart" destination="ERx-1c-Ali" id="WGa-h1-EHE"/>
                     </connections>
                 </controller>
             </objects>
