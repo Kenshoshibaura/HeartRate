@@ -9,11 +9,14 @@
 import WatchKit
 import Foundation
 import HealthKit
+import WatchConnectivity
 
 class InterfaceController: WKInterfaceController {
     
     var hkWorkoutSession: HKWorkoutSession?
     
+    private var session = WCSession.default//
+        
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
         
@@ -154,6 +157,19 @@ class InterfaceController: WKInterfaceController {
             // HealthKit定周期読み出し開始
             self.startReadHK()
         }
+        
+        if isSuported(){
+            session.delegate = self
+            session.activate()
+        }
+    }
+    
+    private func isSuported() -> Bool{
+        return WCSession.isSupported()
+    }
+    
+    private func isReachable() -> Bool{
+        return session.isReachable
     }
     
     // HealthKit データ読み出しの開始
@@ -179,12 +195,18 @@ class InterfaceController: WKInterfaceController {
                     let formatter = DateFormatter()
                     formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MdHms", options: 0, locale: Locale(identifier: "ja_JP"))
                     let now = formatter.string(from: Date())
-                    
+                    let message = ["Data":String(now),"HeartRateLatest":String(value),"HeartRateBefore":String(self.BeforeHeartTemp)]
+
                     DispatchQueue.main.async {
                         self.heartRateLatest = value
                         self.heartRateBefore = self.BeforeHeartTemp
                         self.BeforeHeartTemp = value
                         self.heartRateTime = now
+                        if self.isReachable(){
+                            self.session.sendMessage(message, replyHandler: { replyDict in print(replyDict)},errorHandler: { error in print(error.localizedDescription)})
+                        }else{
+                            print("iPhone is not reachable!!")
+                        }
                     }
                 }
             } )
@@ -281,5 +303,11 @@ extension InterfaceController: HKWorkoutSessionDelegate {
     // エラー発生時処理
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
         NSLog("workoutSession delegate didFailWithError \(error.localizedDescription)")
+    }
+}
+
+extension InterfaceController: WCSessionDelegate{
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print("activationDidCompleteWith activationState:\(activationState) error:\(String(describing: error))")
     }
 }
