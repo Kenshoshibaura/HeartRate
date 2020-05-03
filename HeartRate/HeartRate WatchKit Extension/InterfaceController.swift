@@ -60,7 +60,28 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
+    @IBOutlet weak var CountLocalHeart: WKInterfaceLabel!
+    var heartRateCountLocal: Int = 0 {
+        didSet {
+            if self.heartRateCountLocal < 0 {
+                CountLocalHeart.setText("回数 : ----")
+            } else {
+                CountLocalHeart.setText("回数 : \(self.heartRateCountLocal)")
+            }
+        }
+    }
     
+    @IBOutlet weak var ConnectHeart: WKInterfaceLabel!
+    var CountConnect: Int = 0 {
+        didSet {
+            if self.CountConnect < 0 {
+                ConnectHeart.setText("通信 : ----")
+            } else {
+                ConnectHeart.setText("通信 : \(self.CountConnect)")
+            }
+        }
+    }
+
     @IBOutlet weak var AverageHeart: WKInterfaceLabel!
     var heartRateAverage: Double = 0.0 {
         didSet {
@@ -103,7 +124,7 @@ class InterfaceController: WKInterfaceController {
             }
         }
     }
-    
+
     var dateWorkoutSessionStart: Date?
     var dateWorkoutSessionEnd: Date?
     
@@ -202,8 +223,10 @@ class InterfaceController: WKInterfaceController {
                         self.heartRateBefore = self.BeforeHeartTemp
                         self.BeforeHeartTemp = value
                         self.heartRateTime = now
+                        self.heartRateCountLocal += 1
                         if self.isReachable(){
                             self.session.sendMessage(message, replyHandler: { replyDict in print(replyDict)},errorHandler: { error in print(error.localizedDescription)})
+                            self.CountConnect += 1
                         }else{
                             print("iPhone is not reachable!!")
                         }

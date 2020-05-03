@@ -11,9 +11,13 @@ import HealthKit
 import Foundation
 import WatchConnectivity
 
-var globalHeartRateLatest = 0.0
-var globalHeartRateBefore = 0.0
+var globalHeartRateLatest = 0
+var globalHeartRateBefore = 0
+var globalHeartRateCount = 0
+var globalHeartRateSum = 0
 var globalData = "0"
+var globalReceiveStatus = "未通信"
+var globalSubmitStatus = "未実装"
 
 class ViewController: UIViewController{
     
@@ -57,64 +61,116 @@ class ViewController: UIViewController{
     }
     
     @objc func updateHK(){
-        let object1 = globalData
-        let object2 = globalHeartRateLatest
-        let object3 = globalHeartRateBefore
-        self.Receivedata1 = object1
-        self.Receivedata2 = object2
-        self.Receivedata3 = object3
-    }
-
-    @IBOutlet weak var receivedata1: UILabel!
-    var Receivedata1: String = "0" {
-        didSet {
-            if self.Receivedata1 == "0" {
-                receivedata1.text = "計測日時 : ----"
-            } else {
-                receivedata1.text = "計測日時 : \(self.Receivedata1)"
-            }
+        self.ReceiveValue = globalReceiveStatus
+        self.LatestValue = globalHeartRateLatest
+        self.ChangeValue = globalHeartRateLatest - globalHeartRateBefore
+        
+        if globalHeartRateLatest > self.MaxValue {
+            self.MaxValue = globalHeartRateLatest
         }
-    }
-
-    @IBOutlet weak var receivedata2: UILabel!
-    var Receivedata2: Double = 0.0 {
-        didSet {
-            if self.Receivedata2 == 0.0 {
-                receivedata2.text = "最新心拍数 : ----"
-            } else {
-                receivedata2.text = "最新心拍数 : \(self.Receivedata2)"
-            }
+        if globalHeartRateCount != 0 {
+            self.AverageValue = globalHeartRateSum / globalHeartRateCount
         }
+        if (globalHeartRateLatest < self.MinValue) && (globalHeartRateLatest != 0) {
+            self.MinValue = globalHeartRateLatest
+        }
+        self.CountValue = globalHeartRateCount
+        self.ReceiveValue = globalReceiveStatus
     }
     
-    @IBOutlet weak var receivedata3: UILabel!
-    var Receivedata3: Double = 0.0 {
+    @IBOutlet weak var LatestView: UILabel!
+    var LatestValue: Int = 0 {
         didSet {
-            if self.Receivedata3 == 0.0 {
-                receivedata3.text = "直近心拍数 : ----"
+            if self.LatestValue == 0 {
+                LatestView.text = "000"
             } else {
-                receivedata3.text = "直近心拍数 : \(self.Receivedata3)"
+                LatestView.text = "\(self.LatestValue)"
             }
         }
     }
 
-    @IBAction func DemoTrigger(_ sender: Any) {
-        let object1 = globalData
-        let object2 = globalHeartRateLatest
-        let object3 = globalHeartRateBefore
-        self.Receivedata1 = object1
-        self.Receivedata2 = object2
-        self.Receivedata3 = object3
+    @IBOutlet weak var ChangeView: UILabel!
+    var ChangeValue: Int = 0 {
+        didSet {
+            if self.ChangeValue == 0 {
+                ChangeView.text = "±0"
+            } else if self.ChangeValue > 0{
+                ChangeView.text = "+\(self.ChangeValue)"
+            } else {
+                ChangeView.text = "\(self.ChangeValue)"
+            }
+        }
+    }
 
+    @IBOutlet weak var MaxView: UILabel!
+    var MaxValue: Int = 0 {
+        didSet {
+            if self.MaxValue == 0 {
+                MaxView.text = "000"
+            } else {
+                MaxView.text = "\(self.MaxValue)"
+            }
+        }
     }
-    @IBAction func DemoReset(_ sender: Any) {
-        let object1 = "0"
-        let object2 = 0.0
-        let object3 = 0.0
-        self.Receivedata1 = object1
-        self.Receivedata2 = object2
-        self.Receivedata3 = object3
+
+    @IBOutlet weak var AverageView: UILabel!
+    var AverageValue: Int = 0 {
+        didSet {
+            if self.AverageValue == 0 {
+                AverageView.text = "000"
+            } else {
+                AverageView.text = "\(self.AverageValue)"
+            }
+        }
     }
+
+    @IBOutlet weak var MinView: UILabel!
+    var MinValue: Int = 300 {
+        didSet {
+            if self.MinValue == 300 {
+                MinView.text = "000"
+            } else {
+                MinView.text = "\(self.MinValue)"
+            }
+        }
+    }
+    @IBOutlet weak var CountView: UILabel!
+    var CountValue: Int = 0 {
+        didSet {
+            if self.CountValue == 0 {
+                CountView.text = "000"
+            } else {
+                CountView.text = "\(self.CountValue)"
+            }
+        }
+    }
+
+    @IBOutlet weak var ReceiveView: UILabel!
+    var ReceiveValue: String = "未通信" {
+        didSet {
+            if self.ReceiveValue == "未通信" {
+                ReceiveView.text = "未通信"
+            } else {
+                ReceiveView.text = "\(self.ReceiveValue)"
+            }
+        }
+    }
+
+    @IBAction func DataReset(_ sender: Any) {
+        globalHeartRateLatest = 0
+        globalHeartRateBefore = 0
+        globalHeartRateCount = 0
+        globalHeartRateSum = 0
+        globalReceiveStatus = "未通信"
+        self.LatestValue = 0
+        self.ChangeValue = 0
+        self.MaxValue = 0
+        self.AverageValue = 0
+        self.MinValue = 300
+        self.CountValue = 0
+        self.ReceiveValue = "未通信"
+    }
+    
 }
 
 class SessionHandler : NSObject, WCSessionDelegate{
@@ -152,6 +208,7 @@ class SessionHandler : NSObject, WCSessionDelegate{
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any],replyHandler:@escaping([String:Any]) -> Void) {
+        globalReceiveStatus = "通信中"
         if message["request"] as? String == "version"{
             replyHandler(["version":"\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") ?? "No version")"])
         }
@@ -161,16 +218,19 @@ class SessionHandler : NSObject, WCSessionDelegate{
         
         if object1 != nil{
             globalData = String(object1!)
-            print(globalData)
+            //print(globalData)
         }
         if object2 != nil{
-            globalHeartRateLatest = atof(object2!)
-            print(globalHeartRateLatest)
+            globalHeartRateLatest = Int(atof(object2!))
+            //print(globalHeartRateLatest)
         }
         if object3 != nil{
-            globalHeartRateBefore = atof(object3!)
-            print(globalHeartRateBefore)
+            globalHeartRateBefore = Int(atof(object3!))
+            //print(globalHeartRateBefore)
         }
+        globalHeartRateCount += 1
+        globalHeartRateSum += globalHeartRateLatest
+        globalReceiveStatus = "成功"
 
     }
     

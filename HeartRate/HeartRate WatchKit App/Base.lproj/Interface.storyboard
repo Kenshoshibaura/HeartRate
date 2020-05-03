@@ -19,16 +19,20 @@
                         <label alignment="left" text="最新：----" id="SZF-yf-fHv"/>
                         <label alignment="left" text="直前：----" id="hGk-2L-C53"/>
                         <label alignment="left" text="日時：----" id="ERx-1c-Ali"/>
+                        <label alignment="left" text="回数：----" id="vMZ-Qg-ZBI"/>
+                        <label alignment="left" text="通信：----" id="uIw-hA-WQJ"/>
                         <label alignment="left" text="Workout結果" id="qPj-fh-p5t"/>
                         <label alignment="left" text="平均：----" id="e99-ud-gzY"/>
                         <label alignment="left" text="最大：----" id="QDc-8M-vqX"/>
                         <label alignment="left" text="最小：----" id="udi-qg-xPl"/>
-                        <label alignment="left" text="回数：----" id="Ggw-Mb-9Sz"/>
+                        <label alignment="left" text="回数：----" id="kBS-uZ-eS7"/>
                     </items>
                     <connections>
                         <outlet property="AverageHeart" destination="e99-ud-gzY" id="l84-qU-4c5"/>
                         <outlet property="BeforeHeart" destination="hGk-2L-C53" id="e9a-nr-hnl"/>
-                        <outlet property="CountHeart" destination="Ggw-Mb-9Sz" id="Ofn-Iw-CIU"/>
+                        <outlet property="ConnectHeart" destination="uIw-hA-WQJ" id="ZNX-sg-7aL"/>
+                        <outlet property="CountHeart" destination="kBS-uZ-eS7" id="SD9-77-zcN"/>
+                        <outlet property="CountLocalHeart" destination="vMZ-Qg-ZBI" id="SUg-sI-XEa"/>
                         <outlet property="LatestHeart" destination="SZF-yf-fHv" id="Boi-pA-sRb"/>
                         <outlet property="MaxHeart" destination="QDc-8M-vqX" id="NPT-fL-pay"/>
                         <outlet property="MinHeart" destination="udi-qg-xPl" id="Bhl-zj-NJk"/>
