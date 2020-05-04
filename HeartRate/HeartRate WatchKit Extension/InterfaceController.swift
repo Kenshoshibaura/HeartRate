@@ -19,73 +19,60 @@ class InterfaceController: WKInterfaceController {
         
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-        
         // Configure interface objects here.
     }
     
     override func didDeactivate() {
         // This method is called when watch view controller is no longer visible
+        if timerReadHK!.isValid == true{
+            print("Timer will be stop")
+            timerReadHK!.invalidate()
+            if timerReadHK!.isValid == true{
+                print("Timer is stopped")
+            }else{
+                print("Timer is not stopped")
+            }
+        }
         super.didDeactivate()
     }
     
+    /*
+    override func viewWillAppear(_ animated: Bool){
+        super.viewWillAppear(animated)
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+    override func viewWillDisappear(_ animated: Bool){
+        super.viewWillDisappear(animated)
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+    */
+
     @IBOutlet weak var LatestHeart: WKInterfaceLabel!
-    var heartRateLatest: Double = 0.0 {
+    var heartRateLatest: Int = 0 {
         didSet {
-            if self.heartRateLatest < 0.0 {
+            if self.heartRateLatest < 0 {
                 LatestHeart.setText("最新 : ----")
             } else {
-                LatestHeart.setText("最新 : \(self.heartRateLatest)")
+                LatestHeart.setText("最新 : \(self.heartRateLatest) C:\(self.HeartRateChange)")
             }
         }
     }
-    
-    @IBOutlet weak var BeforeHeart: WKInterfaceLabel!
-    var heartRateBefore: Double = 0.0 {
-        didSet {
-            if self.heartRateBefore < 0.0 {
-                BeforeHeart.setText("直前 : ----")
-            } else {
-                BeforeHeart.setText("直前 : \(self.heartRateBefore)")
-            }
-        }
-    }
-    
-    @IBOutlet weak var TimeHeart: WKInterfaceLabel!
-    var heartRateTime: String = "0000年0月0日 00:00:00" {
-        didSet {
-            if self.heartRateTime == "0000年0月0日 00:00:00" {
-                TimeHeart.setText("日時 : ----")
-            } else {
-                TimeHeart.setText("日時 : \(self.heartRateTime)")
-            }
-        }
-    }
+
     @IBOutlet weak var CountLocalHeart: WKInterfaceLabel!
     var heartRateCountLocal: Int = 0 {
         didSet {
-            if self.heartRateCountLocal < 0 {
+            if self.heartRateCountLocal < 1 {
                 CountLocalHeart.setText("回数 : ----")
             } else {
                 CountLocalHeart.setText("回数 : \(self.heartRateCountLocal)")
             }
         }
     }
-    
-    @IBOutlet weak var ConnectHeart: WKInterfaceLabel!
-    var CountConnect: Int = 0 {
-        didSet {
-            if self.CountConnect < 0 {
-                ConnectHeart.setText("通信 : ----")
-            } else {
-                ConnectHeart.setText("通信 : \(self.CountConnect)")
-            }
-        }
-    }
 
     @IBOutlet weak var AverageHeart: WKInterfaceLabel!
-    var heartRateAverage: Double = 0.0 {
+    var heartRateAverage: Int = 0 {
         didSet {
-            if self.heartRateAverage < 0.0 {
+            if self.heartRateAverage < 0 {
                 AverageHeart.setText("平均 : ----")
             } else {
                 AverageHeart.setText("平均 : \(self.heartRateAverage)")
@@ -94,9 +81,9 @@ class InterfaceController: WKInterfaceController {
     }
     
     @IBOutlet weak var MaxHeart: WKInterfaceLabel!
-    var heartRateMax: Double = 0.0 {
+    var heartRateMax: Int = 0 {
         didSet {
-            if self.heartRateMax < 0.0 {
+            if self.heartRateMax < 0 {
                 MaxHeart.setText("最大 : ----")
             } else {
                 MaxHeart.setText("最大 : \(self.heartRateMax)")
@@ -105,9 +92,9 @@ class InterfaceController: WKInterfaceController {
     }
     
     @IBOutlet weak var MinHeart: WKInterfaceLabel!
-    var heartRateMin: Double = 0.0 {
+    var heartRateMin: Int = 0 {
         didSet {
-            if self.heartRateMin < 0.0 {
+            if self.heartRateMin < 0 {
                 MinHeart.setText("最小 : ----")
             } else {
                 MinHeart.setText("最小 : \(self.heartRateMin)")
@@ -115,9 +102,9 @@ class InterfaceController: WKInterfaceController {
         }
     }
     @IBOutlet weak var CountHeart: WKInterfaceLabel!
-    var heartRateCount: Double = 0.0 {
+    var heartRateCount: Int = 0 {
         didSet {
-            if self.heartRateCount < 0.0 {
+            if self.heartRateCount < 1 {
                 CountHeart.setText("回数 : ----")
             } else {
                 CountHeart.setText("回数 : \(self.heartRateCount)")
@@ -132,18 +119,29 @@ class InterfaceController: WKInterfaceController {
     @IBAction func WorkoutManager(_ value: Bool) {
         if (value) {
             // WorkoutSession開始
+            print("WorkoutSession is start!!")
             self.startWorkoutSession()
             self.dateWorkoutSessionStart = Date()
             self.dateWorkoutSessionEnd = nil
-            self.heartRateAverage = -1.0
-            self.heartRateMax = -1.0
-            self.heartRateMin = -1.0
-            self.heartRateCount = -1.0
+            self.heartRateAverage = -1
+            self.heartRateMax = -1
+            self.heartRateMin = -1
+            self.heartRateCount = 0
         } else {
             // WorkoutSession終了
+            print("WorkoutSession is finished!!")
             self.stopWorkoutSession()
             self.dateWorkoutSessionEnd = Date()
         }
+    }
+    @IBAction func ResetButton() {
+        self.heartRateLatest = 0
+        self.heartRateCountLocal = 0
+        self.heartRateAverage = -1
+        self.heartRateMax = -1
+        self.heartRateMin = -1
+        self.heartRateCount = 0
+        self.stopWorkoutSession()
     }
     
     // HealthKit 関連データ
@@ -153,7 +151,7 @@ class InterfaceController: WKInterfaceController {
     
     // 定周期処理
     var timerReadHK: Timer?
-    let timerIntervalReadHK = 5.0
+    //let timerIntervalReadHK = 5.0
     
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
@@ -174,11 +172,9 @@ class InterfaceController: WKInterfaceController {
                     NSLog("HealthKit Request Authorization error")
                 }
             })
-            
             // HealthKit定周期読み出し開始
             self.startReadHK()
         }
-        
         if isSuported(){
             session.delegate = self
             session.activate()
@@ -188,19 +184,19 @@ class InterfaceController: WKInterfaceController {
     private func isSuported() -> Bool{
         return WCSession.isSupported()
     }
-    
     private func isReachable() -> Bool{
         return session.isReachable
     }
     
     // HealthKit データ読み出しの開始
     func startReadHK() {
-        self.timerReadHK = Timer.scheduledTimer(timeInterval: self.timerIntervalReadHK, target: self, selector: #selector(self.updateHeartRateNormal), userInfo: nil, repeats: true)
+        self.timerReadHK = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.updateHeartRateNormal), userInfo: nil, repeats: true)
     }
     
     let hkUnitHeartRate = HKUnit(from: "count/min")
     
-    var BeforeHeartTemp = 0.0
+    var BeforeHeartTemp = 0
+    var HeartRateChange = 0
     
     // 通常時の心拍数情報更新処理
     @objc func updateHeartRateNormal() {
@@ -212,21 +208,22 @@ class InterfaceController: WKInterfaceController {
                 } else if let samples = samples {
                     let sample = samples[0] as! HKQuantitySample
                     NSLog("[updateHeartRateNormal] resultHandler sample: \(sample.debugDescription)")
-                    let value = sample.quantity.doubleValue(for: self.hkUnitHeartRate)
+                    let value = Int(sample.quantity.doubleValue(for: self.hkUnitHeartRate))
+                    
+                    //計測時刻取得
                     let formatter = DateFormatter()
                     formatter.dateFormat = DateFormatter.dateFormat(fromTemplate: "MdHms", options: 0, locale: Locale(identifier: "ja_JP"))
                     let now = formatter.string(from: Date())
+                    
                     let message = ["Data":String(now),"HeartRateLatest":String(value),"HeartRateBefore":String(self.BeforeHeartTemp)]
 
                     DispatchQueue.main.async {
                         self.heartRateLatest = value
-                        self.heartRateBefore = self.BeforeHeartTemp
+                        self.HeartRateChange = self.heartRateLatest - self.BeforeHeartTemp
                         self.BeforeHeartTemp = value
-                        self.heartRateTime = now
                         self.heartRateCountLocal += 1
                         if self.isReachable(){
                             self.session.sendMessage(message, replyHandler: { replyDict in print(replyDict)},errorHandler: { error in print(error.localizedDescription)})
-                            self.CountConnect += 1
                         }else{
                             print("iPhone is not reachable!!")
                         }
@@ -251,25 +248,25 @@ class InterfaceController: WKInterfaceController {
                     
                     // 回数取得
                     let count = Double(values.count)
-                    self.heartRateCount = count
-                    NSLog("[updateHeartRateWO] resultHandler Count value:\(count)")
+                    self.heartRateCount = Int(count)
+                    //NSLog("[updateHeartRateWO] resultHandler Count value:\(count)")
                     
                     // 平均値取得
                     let total = values.reduce(0, +)
                     let average = total / Double(values.count)
-                    self.heartRateAverage = average
-                    NSLog("[updateHeartRateWO] resultHandler Average value:\(average)")
+                    self.heartRateAverage = Int(average)
+                    //NSLog("[updateHeartRateWO] resultHandler Average value:\(average)")
                     
                     // 最大値取得
                     if let max = values.max() {
-                        self.heartRateMax = max
-                        NSLog("[updateHeartRateWO] resultHandler Max value:\(max)")
+                        self.heartRateMax = Int(max)
+                        //NSLog("[updateHeartRateWO] resultHandler Max value:\(max)")
                     }
                     
                     // 最小値取得
                     if let min = values.min() {
-                        self.heartRateMin = min
-                        NSLog("[updateHeartRateWO] resultHandler Min value:\(min)")
+                        self.heartRateMin = Int(min)
+                        //NSLog("[updateHeartRateWO] resultHandler Min value:\(min)")
                     }
                 }
             })
@@ -281,6 +278,7 @@ class InterfaceController: WKInterfaceController {
 
 // Workout Session 用の拡張定義
 extension InterfaceController: HKWorkoutSessionDelegate {
+    
     // WorkoutSession開始処理
     func startWorkoutSession() {
         let config = HKWorkoutConfiguration()
@@ -290,13 +288,11 @@ extension InterfaceController: HKWorkoutSessionDelegate {
             let session = try HKWorkoutSession(healthStore: self.hkStore, configuration: config)
             session.delegate = self
             self.hkWorkoutSession = session
-            
             session.startActivity(with: nil)
         } catch let e as NSError {
             fatalError("*** Unable to create the workout session: \(e.localizedDescription) ***")
         }
     }
-    
     // WorkoutSession終了処理
     func stopWorkoutSession() {
         guard let workoutSession = self.hkWorkoutSession else { return }
@@ -322,11 +318,11 @@ extension InterfaceController: HKWorkoutSessionDelegate {
             NSLog("Other status \(toState.rawValue)")
         }
     }
-    
     // エラー発生時処理
     func workoutSession(_ workoutSession: HKWorkoutSession, didFailWithError error: Error) {
         NSLog("workoutSession delegate didFailWithError \(error.localizedDescription)")
     }
+    
 }
 
 extension InterfaceController: WCSessionDelegate{

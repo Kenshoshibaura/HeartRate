@@ -11,13 +11,19 @@ import HealthKit
 import Foundation
 import WatchConnectivity
 
+//グローバル変数群 宣言
 var globalHeartRateLatest = 0
 var globalHeartRateBefore = 0
 var globalHeartRateCount = 0
 var globalHeartRateSum = 0
 var globalData = "0"
 var globalReceiveStatus = "未通信"
-var globalSubmitStatus = "未実装"
+var globalSendStatus = "未実装"
+var globalReceiveStartTime = Date()
+var globalReceiveLastSuccessTime = Date()
+var globalSendStartTime = Date()
+var globalSendLastSuccessTime = Date()
+
 
 class ViewController: UIViewController{
     
@@ -56,6 +62,16 @@ class ViewController: UIViewController{
         
     }
     
+    
+    override func viewWillAppear(_ animated: Bool){
+        super.viewWillAppear(animated)
+        UIApplication.shared.isIdleTimerDisabled = true
+    }
+    override func viewWillDisappear(_ animated: Bool){
+        super.viewWillDisappear(animated)
+        UIApplication.shared.isIdleTimerDisabled = false
+    }
+    
     func startReadHK() {
         self.timerReadHK = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateHK), userInfo: nil, repeats: true)
     }
@@ -75,7 +91,22 @@ class ViewController: UIViewController{
             self.MinValue = globalHeartRateLatest
         }
         self.CountValue = globalHeartRateCount
-        self.ReceiveValue = globalReceiveStatus
+        
+        let SuccessSpan = Date().timeIntervalSince(globalReceiveLastSuccessTime)
+        if SuccessSpan > 20.0{
+            self.ReceiveValue = "未通信"
+            globalReceiveStatus = "未通信"
+            self.ReceiveTimeValue = 0//
+        }else{
+            self.ReceiveValue = globalReceiveStatus
+        }
+        if ReceiveValue == "成功"{
+            self.ReceiveTimeValue = Int(Date().timeIntervalSince(globalReceiveStartTime))
+        }
+        if self.ReceiveTimeValue > self.ReceiveTimeMaxValue{
+            self.ReceiveTimeMaxValue = self.ReceiveTimeValue
+        }
+        
     }
     
     @IBOutlet weak var LatestView: UILabel!
@@ -155,13 +186,69 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var ReceiveTimeView: UILabel!
+    var ReceiveTimeValue: Int = 0 {
+        didSet {
+            if self.ReceiveTimeValue == 0 {
+                ReceiveTimeView.text = "000秒"
+            } else {
+                ReceiveTimeView.text = "\(self.ReceiveTimeValue)秒"
+            }
+        }
+    }
+    @IBOutlet weak var ReceiveTimeMaxView: UILabel!
+    var ReceiveTimeMaxValue: Int = 0 {
+        didSet {
+            if self.ReceiveTimeMaxValue == 0 {
+                ReceiveTimeMaxView.text = "000秒"
+            } else {
+                ReceiveTimeMaxView.text = "\(self.ReceiveTimeMaxValue)秒"
+            }
+        }
+    }
+    @IBOutlet weak var SendView: UILabel!
+    var SendValue: String = "未実装" {
+        didSet {
+            if self.SendValue == "未実装" {
+                SendView.text = "未実装"
+            } else {
+                SendView.text = "\(self.SendValue)"
+            }
+        }
+    }
+    @IBOutlet weak var SendTimeView: UILabel!
+    var SendTimeValue: Int = 0 {
+        didSet {
+            if self.SendTimeValue == 0 {
+                SendTimeView.text = "000秒"
+            } else {
+                SendTimeView.text = "\(self.SendTimeValue)秒"
+            }
+        }
+    }
+    @IBOutlet weak var SendTimeMaxView: UILabel!
+    var SendTimeMaxValue: Int = 0 {
+        didSet {
+            if self.SendTimeMaxValue == 0 {
+                SendTimeMaxView.text = "000秒"
+            } else {
+                SendTimeMaxView.text = "\(self.SendTimeMaxValue)秒"
+            }
+        }
+    }
 
+    
     @IBAction func DataReset(_ sender: Any) {
         globalHeartRateLatest = 0
         globalHeartRateBefore = 0
         globalHeartRateCount = 0
         globalHeartRateSum = 0
         globalReceiveStatus = "未通信"
+        globalSendStatus = "未通信"
+        globalReceiveStartTime = Date()
+        globalReceiveLastSuccessTime = Date()
+        globalSendStartTime = Date()
+        globalSendLastSuccessTime = Date()
         self.LatestValue = 0
         self.ChangeValue = 0
         self.MaxValue = 0
@@ -169,6 +256,11 @@ class ViewController: UIViewController{
         self.MinValue = 300
         self.CountValue = 0
         self.ReceiveValue = "未通信"
+        self.ReceiveTimeValue = 0
+        self.ReceiveTimeMaxValue = 0
+        self.SendValue = "未実装"
+        self.SendTimeValue = 0
+        self.SendTimeMaxValue = 0
     }
     
 }
@@ -208,7 +300,7 @@ class SessionHandler : NSObject, WCSessionDelegate{
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any],replyHandler:@escaping([String:Any]) -> Void) {
-        globalReceiveStatus = "通信中"
+        //globalReceiveStatus = "通信中"
         if message["request"] as? String == "version"{
             replyHandler(["version":"\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") ?? "No version")"])
         }
@@ -230,6 +322,10 @@ class SessionHandler : NSObject, WCSessionDelegate{
         }
         globalHeartRateCount += 1
         globalHeartRateSum += globalHeartRateLatest
+        if (globalReceiveStatus != "成功"){
+            globalReceiveStartTime = Date()
+        }
+        globalReceiveLastSuccessTime = Date()
         globalReceiveStatus = "成功"
 
     }
