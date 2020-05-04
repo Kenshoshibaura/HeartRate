@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina5_5" orientation="portrait" appearance="dark"/>
+    <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -390,17 +390,29 @@
                         <viewLayoutGuide key="safeArea" id="Uee-0j-aNJ"/>
                     </view>
                     <connections>
+                        <outlet property="AverageTitle" destination="ImG-R7-jSa" id="Z9n-7h-X0z"/>
                         <outlet property="AverageView" destination="L9m-3i-EfR" id="V20-hh-y3P"/>
+                        <outlet property="ChangeTitle" destination="NJb-eX-lvS" id="Un2-PJ-1m9"/>
                         <outlet property="ChangeView" destination="0qV-nl-qtD" id="sie-u2-Gio"/>
+                        <outlet property="CountTitle" destination="Kbj-Ks-Hpn" id="GL2-pR-A3Z"/>
                         <outlet property="CountView" destination="yJJ-E0-ysv" id="d1j-Ig-V2X"/>
+                        <outlet property="LatestTitle" destination="kk7-dz-7ff" id="5Jd-Fi-9G5"/>
                         <outlet property="LatestView" destination="fRe-Y8-yCl" id="F0d-tZ-AXO"/>
+                        <outlet property="MaxTitle" destination="LZM-Fl-Mil" id="PtO-in-LcN"/>
                         <outlet property="MaxView" destination="bdY-wc-7yl" id="JS1-YN-4fA"/>
+                        <outlet property="MinTitle" destination="tBK-xl-CqA" id="bdP-he-O9l"/>
                         <outlet property="MinView" destination="uSw-0t-SDO" id="NEE-bv-zll"/>
+                        <outlet property="ReceiveTimeMaxTitle" destination="inr-di-DSc" id="nWb-nX-zQg"/>
                         <outlet property="ReceiveTimeMaxView" destination="inr-di-DSc" id="bNx-mX-2q0"/>
+                        <outlet property="ReceiveTimeTitle" destination="Gva-Fu-jgr" id="D7b-No-rRT"/>
                         <outlet property="ReceiveTimeView" destination="Gva-Fu-jgr" id="cSs-gY-2FU"/>
+                        <outlet property="ReceiveTitle" destination="NZS-AO-bD3" id="iMr-x3-vs0"/>
                         <outlet property="ReceiveView" destination="85a-hk-eH2" id="Lqv-qs-Fr1"/>
+                        <outlet property="SendTimeMaxTitle" destination="xMp-3z-r0e" id="jex-90-KyA"/>
                         <outlet property="SendTimeMaxView" destination="LUK-k4-fHZ" id="6UO-qe-evY"/>
+                        <outlet property="SendTimeTitle" destination="JTd-TI-eHx" id="XcZ-BR-JgF"/>
                         <outlet property="SendTimeView" destination="Hb5-sg-wdV" id="F9e-GP-vEp"/>
+                        <outlet property="SendTitle" destination="3Mf-Nf-NyY" id="CGn-Fb-xQd"/>
                         <outlet property="SendView" destination="2UA-hE-nyq" id="Luw-tI-G5F"/>
                     </connections>
                 </viewController>

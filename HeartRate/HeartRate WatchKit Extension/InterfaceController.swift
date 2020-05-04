@@ -273,6 +273,49 @@ class InterfaceController: WKInterfaceController {
             self.hkStore.execute(query)
         }
     }
+    //static let shared = SessionHandler()
+    //private var session = WCSession.default
+    /*
+    override init(){
+        super.init()
+        
+        if isSuported(){
+            session.delegate = self
+            session.activate()
+        }
+        
+        //print("isPaired? \(session.isPaired), isWatchAppInstalled?: \(session.isWatchAppInstalled)")
+    }*/
+    /*
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?){
+        print("activationDidCompleteWith activationState:\(activationState) error:\(String(describing: error))")
+    }*/
+    
+    func sessionDidBecomeInactive(_ session: WCSession) {
+        print("sessionDidBecomeInactive:\(session)")
+    }
+    
+    func sessionDidDeactivate(_ session: WCSession) {
+        print("sessionDidDeactivate:\(session)")
+        self.session.activate()
+    }
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any],replyHandler:@escaping([String:Any]) -> Void) {
+        print("Received")
+        //globalReceiveStatus = "通信中"
+        if message["request"] as? String == "version"{
+            replyHandler(["version":"\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") ?? "No version")"])
+        }
+        let object1 = message["Data"] as? String
+        /*
+        if object1 != nil{
+            globalData = String(object1!)
+            //print(globalData)
+        }*/
+        print("Watch Receive Data is \(object1!)")
+
+    }
+
     
 }
 

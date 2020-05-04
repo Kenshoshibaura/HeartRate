@@ -23,6 +23,7 @@ var globalReceiveStartTime = Date()
 var globalReceiveLastSuccessTime = Date()
 var globalSendStartTime = Date()
 var globalSendLastSuccessTime = Date()
+var globalSendStartJudge = 0
 
 
 class ViewController: UIViewController{
@@ -39,7 +40,35 @@ class ViewController: UIViewController{
     override func viewDidLoad() {
         // This method is called when watch view controller is about to be visible to user
         super.viewDidLoad()
-        
+
+        //定数域 文字色宣言
+        LatestTitle.textColor = UIColor.white
+        ChangeTitle.textColor = UIColor.white
+        AverageTitle.textColor = UIColor.white
+        MaxTitle.textColor = UIColor.white
+        MinTitle.textColor = UIColor.white
+        CountTitle.textColor = UIColor.white
+        ReceiveTitle.textColor = UIColor.white
+        ReceiveTimeTitle.textColor = UIColor.white
+        ReceiveTimeMaxTitle.textColor = UIColor.white
+        SendTitle.textColor = UIColor.gray
+        SendTimeTitle.textColor = UIColor.gray
+        SendTimeMaxTitle.textColor = UIColor.gray
+
+        //変数域 文字色宣言
+        LatestView.textColor = UIColor.white
+        ChangeView.textColor = UIColor.white
+        AverageView.textColor = UIColor.white
+        MaxView.textColor = UIColor.white
+        MinView.textColor = UIColor.white
+        CountView.textColor = UIColor.white
+        ReceiveView.textColor = UIColor.white
+        ReceiveTimeView.textColor = UIColor.white
+        ReceiveTimeMaxView.textColor = UIColor.white
+        SendView.textColor = UIColor.gray
+        SendTimeView.textColor = UIColor.gray
+        SendTimeMaxView.textColor = UIColor.gray
+
         // HealthKit関連初期化処理
         //   ※HealthKit を使用できる場合のみ表示する
         if (HKHealthStore.isHealthDataAvailable()) {
@@ -59,6 +88,7 @@ class ViewController: UIViewController{
         }
         
         self.startReadHK()
+        globalSendStartJudge = 1
         
     }
     
@@ -73,7 +103,7 @@ class ViewController: UIViewController{
     }
     
     func startReadHK() {
-        self.timerReadHK = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.updateHK), userInfo: nil, repeats: true)
+        self.timerReadHK = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(self.updateHK), userInfo: nil, repeats: true)
     }
     
     @objc func updateHK(){
@@ -106,9 +136,11 @@ class ViewController: UIViewController{
         if self.ReceiveTimeValue > self.ReceiveTimeMaxValue{
             self.ReceiveTimeMaxValue = self.ReceiveTimeValue
         }
-        
+        globalSendStartJudge = 1
+
     }
     
+    @IBOutlet weak var LatestTitle: UILabel!
     @IBOutlet weak var LatestView: UILabel!
     var LatestValue: Int = 0 {
         didSet {
@@ -120,6 +152,7 @@ class ViewController: UIViewController{
         }
     }
 
+    @IBOutlet weak var ChangeTitle: UILabel!
     @IBOutlet weak var ChangeView: UILabel!
     var ChangeValue: Int = 0 {
         didSet {
@@ -133,6 +166,7 @@ class ViewController: UIViewController{
         }
     }
 
+    @IBOutlet weak var MaxTitle: UILabel!
     @IBOutlet weak var MaxView: UILabel!
     var MaxValue: Int = 0 {
         didSet {
@@ -144,6 +178,7 @@ class ViewController: UIViewController{
         }
     }
 
+    @IBOutlet weak var AverageTitle: UILabel!
     @IBOutlet weak var AverageView: UILabel!
     var AverageValue: Int = 0 {
         didSet {
@@ -155,6 +190,7 @@ class ViewController: UIViewController{
         }
     }
 
+    @IBOutlet weak var MinTitle: UILabel!
     @IBOutlet weak var MinView: UILabel!
     var MinValue: Int = 300 {
         didSet {
@@ -165,6 +201,7 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var CountTitle: UILabel!
     @IBOutlet weak var CountView: UILabel!
     var CountValue: Int = 0 {
         didSet {
@@ -176,6 +213,7 @@ class ViewController: UIViewController{
         }
     }
 
+    @IBOutlet weak var ReceiveTitle: UILabel!
     @IBOutlet weak var ReceiveView: UILabel!
     var ReceiveValue: String = "未通信" {
         didSet {
@@ -186,6 +224,7 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var ReceiveTimeTitle: UILabel!
     @IBOutlet weak var ReceiveTimeView: UILabel!
     var ReceiveTimeValue: Int = 0 {
         didSet {
@@ -196,6 +235,7 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var ReceiveTimeMaxTitle: UILabel!
     @IBOutlet weak var ReceiveTimeMaxView: UILabel!
     var ReceiveTimeMaxValue: Int = 0 {
         didSet {
@@ -206,6 +246,7 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var SendTitle: UILabel!
     @IBOutlet weak var SendView: UILabel!
     var SendValue: String = "未実装" {
         didSet {
@@ -216,6 +257,7 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var SendTimeTitle: UILabel!
     @IBOutlet weak var SendTimeView: UILabel!
     var SendTimeValue: Int = 0 {
         didSet {
@@ -226,6 +268,7 @@ class ViewController: UIViewController{
             }
         }
     }
+    @IBOutlet weak var SendTimeMaxTitle: UILabel!
     @IBOutlet weak var SendTimeMaxView: UILabel!
     var SendTimeMaxValue: Int = 0 {
         didSet {
@@ -327,7 +370,36 @@ class SessionHandler : NSObject, WCSessionDelegate{
         }
         globalReceiveLastSuccessTime = Date()
         globalReceiveStatus = "成功"
+        
+        if globalSendStartJudge == 1{
+            //startSendMessage()
+            SendMessageForWatch()
+            globalSendStartJudge = 0
+        }
 
     }
+    func isReachable() -> Bool{
+        return session.isReachable
+    }
+    @objc func SendMessageForWatch(){
+        //print("Sending...")
+        let message = ["Data":String(globalHeartRateCount)]
+        //let message = ["Data":String(now),"HeartRateLatest":String(value)]
+        DispatchQueue.main.async {
+            if self.isReachable(){
+                //print("Reachable")
+                self.session.sendMessage(message, replyHandler: { replyDict in print(replyDict)},errorHandler: { error in print(error.localizedDescription)})
+            }else{
+                print("iPhone is not reachable!!")
+            }
+        }
+    }
+    /*
+    var timerSendHK: Timer?
     
+    @objc func startSendMessage() {
+        print("Send Started")
+        self.timerSendHK = Timer.scheduledTimer(timeInterval: 5, target: self, selector: #selector(self.SendMessageForWatch), userInfo: nil, repeats: true)
+    }
+    */
 }
