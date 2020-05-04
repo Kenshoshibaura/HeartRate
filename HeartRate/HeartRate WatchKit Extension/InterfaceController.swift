@@ -25,27 +25,10 @@ class InterfaceController: WKInterfaceController {
     override func didDeactivate() {
         // This method is called when watch view controller is no longer visible
         if timerReadHK!.isValid == true{
-            print("Timer will be stop")
             timerReadHK!.invalidate()
-            if timerReadHK!.isValid == true{
-                print("Timer is stopped")
-            }else{
-                print("Timer is not stopped")
-            }
         }
         super.didDeactivate()
     }
-    
-    /*
-    override func viewWillAppear(_ animated: Bool){
-        super.viewWillAppear(animated)
-        UIApplication.shared.isIdleTimerDisabled = true
-    }
-    override func viewWillDisappear(_ animated: Bool){
-        super.viewWillDisappear(animated)
-        UIApplication.shared.isIdleTimerDisabled = false
-    }
-    */
 
     @IBOutlet weak var LatestHeart: WKInterfaceLabel!
     var heartRateLatest: Int = 0 {
@@ -143,12 +126,15 @@ class InterfaceController: WKInterfaceController {
         self.heartRateCount = 0
         self.stopWorkoutSession()
     }
+    var Latitude = 35.7020691
+    var Longitude = 139.7753269
+    
     @IBOutlet weak var MapView: WKInterfaceMap!
     override init(){
         super.init()
         
-        let coordinate = CLLocationCoordinate2DMake(35.7020691,139.7753269)
-        let span = MKCoordinateSpan(latitudeDelta: 1.0,longitudeDelta: 1.0)
+        let coordinate = CLLocationCoordinate2DMake(Latitude,Longitude)
+        let span = MKCoordinateSpan(latitudeDelta: 0.005,longitudeDelta: 0.005)
         let region = MKCoordinateRegion(center: coordinate,span: span)
         MapView.setRegion(region)
     }
@@ -160,7 +146,6 @@ class InterfaceController: WKInterfaceController {
     
     // 定周期処理
     var timerReadHK: Timer?
-    //let timerIntervalReadHK = 5.0
     
     override func willActivate() {
         // This method is called when watch view controller is about to be visible to user
@@ -258,47 +243,23 @@ class InterfaceController: WKInterfaceController {
                     // 回数取得
                     let count = Double(values.count)
                     self.heartRateCount = Int(count)
-                    //NSLog("[updateHeartRateWO] resultHandler Count value:\(count)")
-                    
                     // 平均値取得
                     let total = values.reduce(0, +)
                     let average = total / Double(values.count)
                     self.heartRateAverage = Int(average)
-                    //NSLog("[updateHeartRateWO] resultHandler Average value:\(average)")
-                    
                     // 最大値取得
                     if let max = values.max() {
                         self.heartRateMax = Int(max)
-                        //NSLog("[updateHeartRateWO] resultHandler Max value:\(max)")
                     }
-                    
                     // 最小値取得
                     if let min = values.min() {
                         self.heartRateMin = Int(min)
-                        //NSLog("[updateHeartRateWO] resultHandler Min value:\(min)")
                     }
                 }
             })
             self.hkStore.execute(query)
         }
     }
-    //static let shared = SessionHandler()
-    //private var session = WCSession.default
-    /*
-    override init(){
-        super.init()
-        
-        if isSuported(){
-            session.delegate = self
-            session.activate()
-        }
-        
-        //print("isPaired? \(session.isPaired), isWatchAppInstalled?: \(session.isWatchAppInstalled)")
-    }*/
-    /*
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?){
-        print("activationDidCompleteWith activationState:\(activationState) error:\(String(describing: error))")
-    }*/
     
     func sessionDidBecomeInactive(_ session: WCSession) {
         print("sessionDidBecomeInactive:\(session)")
@@ -310,18 +271,20 @@ class InterfaceController: WKInterfaceController {
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any],replyHandler:@escaping([String:Any]) -> Void) {
-        print("Received")
-        //globalReceiveStatus = "通信中"
-        if message["request"] as? String == "version"{
-            replyHandler(["version":"\(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") ?? "No version")"])
-        }
-        let object1 = message["Data"] as? String
-        /*
+        let object1 = message["Latitude"] as? String
+        let object2 = message["Longitude"] as? String
+        
         if object1 != nil{
-            globalData = String(object1!)
-            //print(globalData)
-        }*/
-        print("Watch Receive Data is \(object1!)")
+            Latitude = atof(String(object1!))
+        }
+        if object2 != nil{
+            Longitude = atof(String(object2!))
+        }
+        print("Watch Receive Data is \(Latitude),\(Longitude)")
+        let coordinate = CLLocationCoordinate2DMake(Latitude,Longitude)
+        let span = MKCoordinateSpan(latitudeDelta: 0.0005,longitudeDelta: 0.0005)
+        let region = MKCoordinateRegion(center: coordinate,span: span)
+        MapView.setRegion(region)
 
     }
 

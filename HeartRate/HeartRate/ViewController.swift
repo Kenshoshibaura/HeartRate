@@ -386,8 +386,7 @@ class SessionHandler : NSObject, WCSessionDelegate{
         return session.isReachable
     }
     @objc func SendMessageForWatch(){
-        let message = ["Data":String(globalHeartRateCount)]
-        //let message = ["Data":String(now),"HeartRateLatest":String(value)]
+        let message = ["Latitude":String(globalLatitudeNow),"Longitude":String(globalLongitudeNow)]
         DispatchQueue.main.async {
             if self.isReachable(){
                 self.session.sendMessage(message, replyHandler: { replyDict in print(replyDict)},errorHandler: { error in print(error.localizedDescription)})
