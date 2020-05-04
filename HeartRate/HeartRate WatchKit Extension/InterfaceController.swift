@@ -143,6 +143,15 @@ class InterfaceController: WKInterfaceController {
         self.heartRateCount = 0
         self.stopWorkoutSession()
     }
+    @IBOutlet weak var MapView: WKInterfaceMap!
+    override init(){
+        super.init()
+        
+        let coordinate = CLLocationCoordinate2DMake(35.7020691,139.7753269)
+        let span = MKCoordinateSpan(latitudeDelta: 1.0,longitudeDelta: 1.0)
+        let region = MKCoordinateRegion(center: coordinate,span: span)
+        MapView.setRegion(region)
+    }
     
     // HealthKit 関連データ
     let hkStore = HKHealthStore()

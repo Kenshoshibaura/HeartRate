@@ -25,6 +25,8 @@
 		BE9885FC24571C2900ABC0ED /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE9885FB24571C2900ABC0ED /* Assets.xcassets */; };
 		BE98861524571CD000ABC0ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE98861424571CD000ABC0ED /* HealthKit.framework */; };
 		BE98861824571D0A00ABC0ED /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE98861724571D0A00ABC0ED /* HealthKit.framework */; };
+		BE98861A24604F3500ABC0ED /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE98861924604F3500ABC0ED /* MapKit.framework */; };
+		BE98861C24604F6900ABC0ED /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE98861B24604F6900ABC0ED /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +115,8 @@
 		BE98861424571CD000ABC0ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS6.2.sdk/System/Library/Frameworks/HealthKit.framework; sourceTree = DEVELOPER_DIR; };
 		BE98861624571D0A00ABC0ED /* HeartRate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HeartRate.entitlements; sourceTree = "<group>"; };
 		BE98861724571D0A00ABC0ED /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
+		BE98861924604F3500ABC0ED /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		BE98861B24604F6900ABC0ED /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = Platforms/WatchOS.platform/Developer/SDKs/WatchOS6.2.sdk/System/Library/Frameworks/MapKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +124,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE98861A24604F3500ABC0ED /* MapKit.framework in Frameworks */,
 				BE98861824571D0A00ABC0ED /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -142,6 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE98861C24604F6900ABC0ED /* MapKit.framework in Frameworks */,
 				BE98861524571CD000ABC0ED /* HealthKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -234,6 +240,8 @@
 		BE98861324571CD000ABC0ED /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BE98861B24604F6900ABC0ED /* MapKit.framework */,
+				BE98861924604F3500ABC0ED /* MapKit.framework */,
 				BE98861724571D0A00ABC0ED /* HealthKit.framework */,
 				BE98861424571CD000ABC0ED /* HealthKit.framework */,
 			);

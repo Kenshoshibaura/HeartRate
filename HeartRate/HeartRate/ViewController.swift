@@ -10,6 +10,8 @@ import UIKit
 import HealthKit
 import Foundation
 import WatchConnectivity
+import CoreLocation
+import MapKit
 
 //グローバル変数群 宣言
 var globalHeartRateLatest = 0
@@ -21,17 +23,21 @@ var globalReceiveStatus = "未通信"
 var globalSendStatus = "未実装"
 var globalReceiveStartTime = Date()
 var globalReceiveLastSuccessTime = Date()
-var globalSendStartTime = Date()
-var globalSendLastSuccessTime = Date()
+//var globalSendStartTime = Date()
+//var globalSendLastSuccessTime = Date()
 var globalSendStartJudge = 0
+var globalLatitudeNow = 35.68154
+var globalLongitudeNow = 139.752498
 
 
-class ViewController: UIViewController{
-    
+class ViewController: UIViewController,MKMapViewDelegate, CLLocationManagerDelegate{
+
     // HealthKit 関連データ
     let hkStore = HKHealthStore()
     var hkIsAuthorized = false
     let hkTypeHeartRate = HKObjectType.quantityType(forIdentifier: .heartRate)!
+    
+    var locationManager:CLLocationManager!
 
     // 定周期処理
     var timerReadHK: Timer?
@@ -51,9 +57,6 @@ class ViewController: UIViewController{
         ReceiveTitle.textColor = UIColor.white
         ReceiveTimeTitle.textColor = UIColor.white
         ReceiveTimeMaxTitle.textColor = UIColor.white
-        SendTitle.textColor = UIColor.gray
-        SendTimeTitle.textColor = UIColor.gray
-        SendTimeMaxTitle.textColor = UIColor.gray
 
         //変数域 文字色宣言
         LatestView.textColor = UIColor.white
@@ -65,9 +68,6 @@ class ViewController: UIViewController{
         ReceiveView.textColor = UIColor.white
         ReceiveTimeView.textColor = UIColor.white
         ReceiveTimeMaxView.textColor = UIColor.white
-        SendView.textColor = UIColor.gray
-        SendTimeView.textColor = UIColor.gray
-        SendTimeMaxView.textColor = UIColor.gray
 
         // HealthKit関連初期化処理
         //   ※HealthKit を使用できる場合のみ表示する
@@ -86,11 +86,55 @@ class ViewController: UIViewController{
             })
             
         }
+        setupLocationManager()
         
         self.startReadHK()
         globalSendStartJudge = 1
         
     }
+    var MapManager:CLLocationManager = CLLocationManager()
+    
+    func setupLocationManager(){
+        MapManager.delegate = self
+        MapManager.startUpdatingLocation()
+        MapManager.requestWhenInUseAuthorization()
+        
+        let location:CLLocationCoordinate2D = CLLocationCoordinate2DMake(globalLatitudeNow,globalLongitudeNow)
+        //print("latitudenow: \(LatitudeNow)\nlongitudenow: \(LongitudeNow)")
+        MapView.setCenter(location,animated:true)
+        
+        var region:MKCoordinateRegion = MapView.region
+        region.center = location
+        region.span.latitudeDelta = 0.003
+        region.span.longitudeDelta = 0.003
+        
+        MapView.setRegion(region,animated:true)
+        MapView.mapType = MKMapType.standard
+
+    }
+    
+    var annotation:MKPointAnnotation!
+    
+    func locationManager(_ manager: CLLocationManager,didUpdateLocations locations: [CLLocation]){
+        let location = locations.first
+        let latitude = location?.coordinate.latitude
+        let longitude = location?.coordinate.longitude
+        globalLatitudeNow = Double(latitude!)
+        globalLongitudeNow = Double(longitude!)
+        let locationnow:CLLocationCoordinate2D = CLLocationCoordinate2DMake(globalLatitudeNow,globalLongitudeNow)
+        MapView.setCenter(locationnow,animated:true)
+        
+        if (annotation == nil){
+            annotation = MKPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2DMake(globalLatitudeNow,globalLongitudeNow)
+            MapView.addAnnotation(annotation)
+        }else{
+            annotation.coordinate = CLLocationCoordinate2DMake(globalLatitudeNow,globalLongitudeNow)
+        }
+        globalSendStartJudge = 1
+    }
+    
+    @IBOutlet weak var MapView: MKMapView!
     
     
     override func viewWillAppear(_ animated: Bool){
@@ -136,7 +180,6 @@ class ViewController: UIViewController{
         if self.ReceiveTimeValue > self.ReceiveTimeMaxValue{
             self.ReceiveTimeMaxValue = self.ReceiveTimeValue
         }
-        globalSendStartJudge = 1
 
     }
     
@@ -246,40 +289,6 @@ class ViewController: UIViewController{
             }
         }
     }
-    @IBOutlet weak var SendTitle: UILabel!
-    @IBOutlet weak var SendView: UILabel!
-    var SendValue: String = "未実装" {
-        didSet {
-            if self.SendValue == "未実装" {
-                SendView.text = "未実装"
-            } else {
-                SendView.text = "\(self.SendValue)"
-            }
-        }
-    }
-    @IBOutlet weak var SendTimeTitle: UILabel!
-    @IBOutlet weak var SendTimeView: UILabel!
-    var SendTimeValue: Int = 0 {
-        didSet {
-            if self.SendTimeValue == 0 {
-                SendTimeView.text = "000秒"
-            } else {
-                SendTimeView.text = "\(self.SendTimeValue)秒"
-            }
-        }
-    }
-    @IBOutlet weak var SendTimeMaxTitle: UILabel!
-    @IBOutlet weak var SendTimeMaxView: UILabel!
-    var SendTimeMaxValue: Int = 0 {
-        didSet {
-            if self.SendTimeMaxValue == 0 {
-                SendTimeMaxView.text = "000秒"
-            } else {
-                SendTimeMaxView.text = "\(self.SendTimeMaxValue)秒"
-            }
-        }
-    }
-
     
     @IBAction func DataReset(_ sender: Any) {
         globalHeartRateLatest = 0
@@ -290,8 +299,6 @@ class ViewController: UIViewController{
         globalSendStatus = "未通信"
         globalReceiveStartTime = Date()
         globalReceiveLastSuccessTime = Date()
-        globalSendStartTime = Date()
-        globalSendLastSuccessTime = Date()
         self.LatestValue = 0
         self.ChangeValue = 0
         self.MaxValue = 0
@@ -301,9 +308,6 @@ class ViewController: UIViewController{
         self.ReceiveValue = "未通信"
         self.ReceiveTimeValue = 0
         self.ReceiveTimeMaxValue = 0
-        self.SendValue = "未実装"
-        self.SendTimeValue = 0
-        self.SendTimeMaxValue = 0
     }
     
 }
@@ -382,12 +386,10 @@ class SessionHandler : NSObject, WCSessionDelegate{
         return session.isReachable
     }
     @objc func SendMessageForWatch(){
-        //print("Sending...")
         let message = ["Data":String(globalHeartRateCount)]
         //let message = ["Data":String(now),"HeartRateLatest":String(value)]
         DispatchQueue.main.async {
             if self.isReachable(){
-                //print("Reachable")
                 self.session.sendMessage(message, replyHandler: { replyDict in print(replyDict)},errorHandler: { error in print(error.localizedDescription)})
             }else{
                 print("iPhone is not reachable!!")

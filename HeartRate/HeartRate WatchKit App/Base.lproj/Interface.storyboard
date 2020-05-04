@@ -27,18 +27,20 @@
                                 <action selector="ResetButton" destination="AgC-eL-Hgc" id="5Uf-4S-Oi2"/>
                             </connections>
                         </button>
+                        <map height="100" alignment="left" id="9hb-ro-s70"/>
                     </items>
                     <connections>
                         <outlet property="AverageHeart" destination="e99-ud-gzY" id="l84-qU-4c5"/>
                         <outlet property="CountHeart" destination="kBS-uZ-eS7" id="SD9-77-zcN"/>
                         <outlet property="CountLocalHeart" destination="vMZ-Qg-ZBI" id="SUg-sI-XEa"/>
                         <outlet property="LatestHeart" destination="SZF-yf-fHv" id="Boi-pA-sRb"/>
+                        <outlet property="MapView" destination="9hb-ro-s70" id="Xzy-O9-IMp"/>
                         <outlet property="MaxHeart" destination="QDc-8M-vqX" id="NPT-fL-pay"/>
                         <outlet property="MinHeart" destination="udi-qg-xPl" id="Bhl-zj-NJk"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="220" y="345"/>
+            <point key="canvasLocation" x="220" y="259"/>
         </scene>
         <!--Static Notification Interface Controller-->
         <scene sceneID="AEw-b0-oYE">
